@@ -197,6 +197,6 @@ EOF
 	fi
 fi
 
-if [ x"$DELETE_LOG" = x"yes" ]; then
+if [ x"$DELETE_LOG" = x"yes" ] && [ x"$_error" = x"0" ]; then
 	rm -f "$LOG_FILE"  # Delete log file
 fi
