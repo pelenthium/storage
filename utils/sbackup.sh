@@ -18,7 +18,7 @@ SS_CONTAINER="backups"  # Storage container where we put backup files
 # Backup settings
 TARGET_DIR="/var/www/siterootdir"  # What to backup
 #BACKUP_NAME="mysite"  # Name for backup, default the last folder name in target
-BACKUP_NAME=`expr match "${TARGET_DIR%%/}" '.*/\(.*\)'`
+BACKUP_NAME=`_t="${TARGET_DIR%/}" && echo "${_t##*/}"`
 BACKUP_DIR="/var/backups/$BACKUP_NAME"  # Where our backup will be placed
 EXCLUDE_LIST="\
 *~
