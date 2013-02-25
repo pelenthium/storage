@@ -38,7 +38,7 @@ DB_PORT="3306"
 EMAIL="admin@site.test"  # Email for send log, set empty if don't want seng log
 EMAIL_ONLY_ON_ERROR="no"  # Send a email only if there was something strange (yes:no) 
 
-DELETE_LOG="yes"  # remove log after complite? (yes:no)
+DELETE_LOG="yes"  # remove log when finished? (yes:no)
 DELETE_BACKUPS_AFTER_UPLOAD="no"  # remove backups files after successful upload to Storage (yes:no)
 # How long store backup in the Storage (in days)? If you set 30, uploaded file will be auto removed after 30 days.
 STORAGE_EXPIRE=""
