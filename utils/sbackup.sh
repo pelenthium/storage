@@ -45,6 +45,8 @@ STORAGE_EXPIRE=""
 
 # ------- Utils -------
 SUPLOAD=`which supload`
+# or set path manual
+#SUPLOAD="/usr/local/bin/supload"
 MYSQLDUMP=`which mysqldump`
 BZIP=`which bzip2`
 TAR=`which tar`
