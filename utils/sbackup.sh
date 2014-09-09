@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Script for do automatic backups files and dbs (mysql)
+# Script for do automatic backups files and dbs (mysql, pgsql)
 # to Selectel Cloud Storage (http://selectel.ru/services/cloud-storage/)
 #
-# version: 1.0
+# version: 1.1
 #
 # Authors:
 # - Konstantin Kapustin <sirkonst@gmail.com>
@@ -28,12 +28,13 @@ EXCLUDE_LIST="\
 .git/
 .svn/
 "
-# Mysql backup settings
+# SQL backup settings
+DB_TYPE="mysql" # (mysql:pgsql)
 DB_NAME="site_db_name"  # Database name, set __ALL__ for backup all dbs or empty for disable backup
 DB_USER="site_user"
 DB_PWD="site_user_pwd"
 DB_HOST="localhost"
-DB_PORT="3306"
+DB_PORT="3306" # Usually 3306 for MySQL and 5432 for PostgreSQL
 
 EMAIL="admin@site.test"  # Email for send log, set empty if don't want seng log
 EMAIL_ONLY_ON_ERROR="no"  # Send a email only if there was something strange (yes:no) 
@@ -48,6 +49,7 @@ SUPLOAD=`which supload`
 # or set path manual
 #SUPLOAD="/usr/local/bin/supload"
 MYSQLDUMP=`which mysqldump`
+PGDUMP=`which pg_dump`
 BZIP=`which bzip2`
 TAR=`which tar`
 SENDMAIL=`which sendmail`
@@ -92,18 +94,23 @@ LOG_FILE="$BACKUP_DIR/log_$BACKUP_NAME-$TIMESTAMP.log"
 declare -a _for_upload
 
 if [ x"$DB_NAME" = "x__ALL__" ]; then
-	DB_BACKUP_FILENAME="mysql_${BACKUP_NAME}_ALL_$TIMESTAMP.sql"
+	DB_BACKUP_FILENAME="${DB_TYPE}_${BACKUP_NAME}_ALL_$TIMESTAMP.sql"
 	DB_NAME=""
 else
 	if [ -z "$DB_NAME" ]; then
 		DB_BACKUP_FILENAME=""
 	else
-		DB_BACKUP_FILENAME="mysql_${BACKUP_NAME}_${DB_NAME}_$TIMESTAMP.sql"
+		DB_BACKUP_FILENAME="${DB_TYPE}_${BACKUP_NAME}_${DB_NAME}_$TIMESTAMP.sql"
 	fi
 fi
 
-if [ -n "$DB_BACKUP_FILENAME" ] && [ -z "$MYSQLDUMP" ]; then
+if [ -n "$DB_BACKUP_FILENAME" ] && [ "$DB_TYPE" = "mysql" ] && [ -z "$MYSQLDUMP" ]; then
 	echo "[!] mysqldump is not installed!"
+	exit 1
+fi
+
+if [ -n "$DB_BACKUP_FILENAME" ] && [ "$DB_TYPE" = "pgsql" ] && [ -z "$PGDUMP" ]; then
+	echo "[!] pg_dump is not installed!"
 	exit 1
 fi
 
@@ -144,12 +151,18 @@ echo "$(date +%H:%M:%S) Files backup put to $BACKUP_DIR/$BACKUP_FILENAME ($files
 
 _for_upload=( "${_for_upload[@]}" "$BACKUP_DIR/$BACKUP_FILENAME")
 
-# ------- Backup Mysql -------
+# ------- Backup databases -------
 if [ -n "$DB_BACKUP_FILENAME" ]; then
-	# Create MySQL database dump
+	# Create database dump
 	echo "$(date +%H:%M:%S) Creating DB dump for ${DB_NAME:-ALL dbs}" | _log
 
-	$MYSQLDUMP --opt -u "$DB_USER" -p"$DB_PWD" -h "$DB_HOST" -P "$DB_PORT" "${DB_NAME:---all-databases}" > "$BACKUP_DIR/$DB_BACKUP_FILENAME"
+	if [ "$DB_TYPE" = "mysql" ]; then
+		$MYSQLDUMP --opt -u "$DB_USER" -p"$DB_PWD" -h "$DB_HOST" -P "$DB_PORT" "${DB_NAME:---all-databases}" > "$BACKUP_DIR/$DB_BACKUP_FILENAME"
+	fi
+	if [ "$DB_TYPE" = "pgsql" ]; then
+		PGPASSWORD="$DB_PWD" $PGDUMP -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -F p -f "$BACKUP_DIR/$DB_BACKUP_FILENAME" "$DB_NAME"
+	fi
+
 	$BZIP -9 --force "$BACKUP_DIR/$DB_BACKUP_FILENAME"
 	DB_BACKUP_FILENAME="$DB_BACKUP_FILENAME.bz2"
 
