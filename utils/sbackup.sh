@@ -140,7 +140,7 @@ echo "$(date +%H:%M:%S) Begin backup $BACKUP_NAME" | _log
 echo "$(date +%H:%M:%S) Archiving files $TARGET_DIR" | _log
 tar_exc=""
 for line in ${EXCLUDE_LIST}; do
-	tar_exc="$tar_exc --exclude '$line'"
+	tar_exc="$tar_exc --exclude $line"
 done
 cd "$TARGET_DIR/.."
 _target=`expr match "${TARGET_DIR%%/}" '.*/\(.*\)'`
