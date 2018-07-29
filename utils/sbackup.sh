@@ -11,12 +11,12 @@
 
 # ------- Settings -------
 # Selectel Storage settings
-SS_USER=""  # Storage user
-SS_PWD=""  # Storage password
-SS_CONTAINER="backups"  # Storage container where we put backup files
+SS_USER="${SS_USER}"  # Storage user
+SS_PWD="${SS_PASSWORD}"  # Storage password
+SS_CONTAINER="${SS_CONTAINER}"  # Storage container where we put backup files
 
 # Backup settings
-TARGET_DIR="/var/www/siterootdir"  # What to backup
+TARGET_DIR="${TAGRET_DIR}"  # What to backup
 #BACKUP_NAME="mysite"  # Name for backup, default the last folder name in target
 BACKUP_NAME=`_t="${TARGET_DIR%/}" && echo "${_t##*/}"`
 BACKUP_DIR="/var/backups/$BACKUP_NAME"  # Where our backup will be placed
@@ -29,20 +29,20 @@ EXCLUDE_LIST="\
 .svn/
 "
 # SQL backup settings
-DB_TYPE="mysql" # (mysql:pgsql)
-DB_NAME="site_db_name"  # Database name, set __ALL__ for backup all dbs or empty for disable backup
-DB_USER="site_user"
-DB_PWD="site_user_pwd"
+DB_TYPE="${DB_TYPE}" # (mysql:pgsql)
+DB_NAME="__ALL__"  # Database name, set __ALL__ for backup all dbs or empty for disable backup
+DB_USER="${DB_USER}"
+DB_PWD="${DB_PASSWORD}"
 DB_HOST="localhost"
-DB_PORT="3306" # Usually 3306 for MySQL and 5432 for PostgreSQL
+DB_PORT="${DB_PORT}" # Usually 3306 for MySQL and 5432 for PostgreSQL
 
-EMAIL="admin@site.test"  # Email for send log, set empty if don't want seng log
-EMAIL_ONLY_ON_ERROR="no"  # Send a email only if there was something strange (yes:no) 
+EMAIL="${ADMIN_EMAIL}"  # Email for send log, set empty if don't want seng log
+EMAIL_ONLY_ON_ERROR="yes"  # Send a email only if there was something strange (yes:no) 
 
 DELETE_LOG="yes"  # remove log when finished? (yes:no)
-DELETE_BACKUPS_AFTER_UPLOAD="no"  # remove backups files after successful upload to Storage (yes:no)
+DELETE_BACKUPS_AFTER_UPLOAD="yes"  # remove backups files after successful upload to Storage (yes:no)
 # How long store backup in the Storage (in days)? If you set 30, uploaded file will be auto removed after 30 days.
-STORAGE_EXPIRE=""
+STORAGE_EXPIRE="10"
 
 # ------- Utils -------
 SUPLOAD=`which supload`
